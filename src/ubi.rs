@@ -118,7 +118,7 @@ fn write_vid_header(
 fn volume_table(fip_pebs: usize) -> Vec<u8> {
     let mut table = vec![0u8; UBI_MAX_VOLUMES * UBI_VTBL_RECORD_SIZE];
 
-    for record in table.chunks_exact_mut(UBI_VTBL_RECORD_SIZE) {
+    for record in table.as_chunks_mut::<UBI_VTBL_RECORD_SIZE>().0 {
         let crc = crc32_ubi(&record[..168]);
         put_u32_be(record, 168, crc);
     }
