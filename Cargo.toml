@@ -1,0 +1,27 @@
+[package]
+name = "an758x-stock2ubi"
+version = "0.1.14"
+edition = "2024"
+license = "GPL-2.0-only"
+include = [
+    "Cargo.toml",
+    "Cargo.lock",
+    "README.md",
+    ".cargo/config.toml",
+    "src/**",
+    "an758x_mtd_rw.c",
+    "an758x_mtd_rw.ko",
+]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+axum = { version = "0.8", features = ["multipart"] }
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["fs", "io-util", "macros", "net", "rt-multi-thread", "time"] }
+tokio-util = { version = "0.7", features = ["io"] }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

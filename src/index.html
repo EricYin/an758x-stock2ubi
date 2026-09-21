@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AN758x Stock2UBI</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f5f6f8; color: #18202a; }
+    body { margin: 0; padding: 32px 18px; }
+    main { max-width: 920px; margin: auto; background: #fff; border: 1px solid #dfe3e8; border-radius: 10px; overflow: hidden; }
+    section { padding: 24px; }
+    section + section { border-top: 1px solid #dfe3e8; }
+    h1, h2 { margin: 0 0 18px; font-weight: 650; }
+    h1 { font-size: 23px; }
+    h1 small { color: #667085; font-size: 13px; font-weight: 500; }
+    h2 { font-size: 18px; }
+    .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .top h1 { margin-bottom: 0; }
+    .top button { flex: none; padding: 7px 12px; font-size: 13px; }
+    .steps { display: flex; gap: 24px; padding: 0; margin: 24px 0 0; list-style: none; color: #667085; font-size: 14px; }
+    .steps [aria-current=step] { color: #1869b7; font-weight: 650; }
+    .step[hidden], button[hidden] { display: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #edf0f2; text-align: left; }
+    th { color: #56616f; font-weight: 600; }
+    a { color: #1267c4; text-decoration: none; }
+    .files { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display: grid; gap: 7px; font-size: 14px; font-weight: 600; }
+    input[type=file] { padding: 12px; border: 1px solid #cbd2d9; border-radius: 7px; background: #fafbfc; }
+    button { padding: 11px 18px; border: 0; border-radius: 7px; background: #1869b7; color: white; font: inherit; cursor: pointer; }
+    button:disabled { background: #a9b3bd; cursor: default; }
+    button.secondary { color: #344054; background: #f2f4f7; }
+    .actions { display: flex; justify-content: space-between; padding: 20px 24px; border-top: 1px solid #dfe3e8; }
+    footer { padding: 14px 24px; border-top: 1px solid #dfe3e8; text-align: center; font-size: 13px; }
+    .hint, #status { margin: 12px 0 0; color: #5c6672; font-size: 14px; }
+    #status.error { color: #b42318; }
+    #status.ok { color: #067647; }
+    @media (max-width: 680px) { .files { grid-template-columns: 1fr; } th:nth-child(4), td:nth-child(4), th:nth-child(5), td:nth-child(5) { display: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <section>
+    <header class="top">
+      <h1><span data-t="title">AN758x Stock2UBI Flashing Tool</span> <small>v{{VERSION}}</small></h1>
+      <button id="language" class="secondary" type="button">Chinese</button>
+    </header>
+    <ol class="steps" aria-label="Wizard steps" data-t-aria="wizardSteps">
+      <li id="step-label-backup" aria-current="step" data-t="backupStep">1. Back up partitions</li>
+      <li id="step-label-flash" aria-current="false" data-t="flashStep">2. Install recovery bootloader</li>
+    </ol>
+  </section>
+  <section id="step-backup" class="step" aria-labelledby="backup-title">
+    <h2 id="backup-title" data-t="backupTitle">Back up partitions</h2>
+    <p class="hint" data-t="backupHint">Save a copy of any partitions you want to keep.</p>
+    {{PARTITIONS}}
+  </section>
+  <section id="step-flash" class="step" aria-labelledby="flash-title" hidden>
+    <h2 id="flash-title" data-t="flashTitle">Install recovery bootloader</h2>
+    <p><span data-t="ubootSource">Download the U-Boot images from</span> <a href="https://github.com/pbs05/uboot-an758x" target="_blank" rel="noopener noreferrer">pbs05/uboot-an758x</a><span data-t="ubootSuffix">.</span></p>
+    <form id="flash-form">
+      <div class="files">
+        <label><span data-t="bl2Label">BL2 (preloader.bin or firstblock.bin)</span>
+          <input id="bl2" name="bl2" type="file" required>
+        </label>
+        <label><span data-t="fipLabel">BL31 + U-Boot FIP</span>
+          <input id="fip" name="fip" type="file" required>
+        </label>
+      </div>
+      <p class="hint"><span data-t="recoveryPrefix">After rebooting, open</span> <a href="http://192.168.0.1/">192.168.0.1</a> <span data-t="recoverySuffix">to continue in U-Boot recovery. The page may take about a minute to appear on the first boot.</span></p>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+  <nav class="actions" aria-label="Wizard actions" data-t-aria="wizardActions">
+    <button id="back" class="secondary" type="button" data-t="back" disabled>Back</button>
+    <button id="next" type="button" data-t="next">Continue</button>
+    <button id="submit" type="submit" form="flash-form" data-t="write" hidden disabled>Install bootloader</button>
+  </nav>
+  <footer><a href="https://github.com/pbs05/an758x-stock2ubi" target="_blank" rel="noopener noreferrer">GitHub · an758x-stock2ubi</a></footer>
+</main>
+<script>
+const words = {
+  en: {
+    title: 'AN758x Stock2UBI Flashing Tool',
+    wizardSteps: 'Wizard steps', wizardActions: 'Wizard actions',
+    backupStep: '1. Back up partitions', flashStep: '2. Install recovery bootloader',
+    backupTitle: 'Back up partitions', backupHint: 'Save a copy of any partitions you want to keep.',
+    noPartitions: 'No MTD partitions found.', device: 'Device', name: 'Name', size: 'Size',
+    eraseBlock: 'Erase block', physicalOffset: 'Physical offset', download: 'Download',
+    flashTitle: 'Install recovery bootloader', ubootSource: 'Download the U-Boot images from', ubootSuffix: '.',
+    bl2Label: 'BL2 (preloader.bin or firstblock.bin)', fipLabel: 'BL31 + U-Boot FIP',
+    recoveryPrefix: 'After rebooting, open',
+    recoverySuffix: 'to continue in U-Boot recovery. The page may take about a minute to appear on the first boot.',
+    back: 'Back', next: 'Continue', write: 'Install bootloader',
+    backupConfirm: 'Have you saved the partitions you want to keep?',
+    working: 'Checking images and writing the bootloader…'
+  },
+  zh: {
+    title: 'AN758x stock2ubi免拆刷机工具',
+    wizardSteps: '引导步骤', wizardActions: '引导操作',
+    backupStep: '1. 备份分区', flashStep: '2. 刷入恢复引导',
+    backupTitle: '备份分区', backupHint: '请下载并保存需要保留的分区。',
+    noPartitions: '没有发现 MTD 分区。', device: '设备', name: '名称', size: '大小',
+    eraseBlock: '擦除块', physicalOffset: '物理偏移', download: '下载',
+    flashTitle: '刷入恢复引导', ubootSource: 'U-Boot 镜像下载地址：', ubootSuffix: '。',
+    bl2Label: 'BL2（preloader.bin 或 firstblock.bin）', fipLabel: 'BL31 + U-Boot FIP',
+    recoveryPrefix: '重启后访问',
+    recoverySuffix: '，继续在 U-Boot 恢复页面安装。首次启动时，页面可能需要约 1 分钟才会出现。',
+    back: '返回', next: '继续', write: '刷入引导',
+    backupConfirm: '需要保留的分区都备份好了吗？',
+    working: 'Checking images and writing the bootloader…'
+  }
+};
+let language = (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+const t = key => words[language][key];
+const languageButton = document.querySelector('#language');
+function applyLanguage() {
+  document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  document.title = t('title');
+  document.querySelectorAll('[data-t]').forEach(element => { element.textContent = t(element.dataset.t); });
+  document.querySelectorAll('[data-t-aria]').forEach(element => { element.setAttribute('aria-label', t(element.dataset.tAria)); });
+  languageButton.textContent = language === 'zh' ? 'English' : '中文';
+}
+languageButton.addEventListener('click', () => { language = language === 'en' ? 'zh' : 'en'; applyLanguage(); });
+applyLanguage();
+
+const form = document.querySelector('#flash-form');
+const bl2 = document.querySelector('#bl2');
+const fip = document.querySelector('#fip');
+const back = document.querySelector('#back');
+const next = document.querySelector('#next');
+const submit = document.querySelector('#submit');
+const status = document.querySelector('#status');
+const backupStep = document.querySelector('#step-backup');
+const flashStep = document.querySelector('#step-flash');
+const backupLabel = document.querySelector('#step-label-backup');
+const flashLabel = document.querySelector('#step-label-flash');
+let writing = false;
+function updateButton() { submit.disabled = writing || !bl2.files.length || !fip.files.length; }
+function showStep(step) {
+  const backup = step === 'backup';
+  backupStep.hidden = !backup;
+  flashStep.hidden = backup;
+  back.disabled = backup || writing;
+  next.hidden = !backup;
+  submit.hidden = backup;
+  backupLabel.setAttribute('aria-current', backup ? 'step' : 'false');
+  flashLabel.setAttribute('aria-current', backup ? 'false' : 'step');
+  updateButton();
+}
+next.addEventListener('click', () => {
+  if (window.confirm(t('backupConfirm'))) showStep('flash');
+});
+back.addEventListener('click', () => showStep('backup'));
+bl2.addEventListener('change', updateButton);
+fip.addEventListener('change', updateButton);
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  writing = true;
+  back.disabled = true;
+  updateButton();
+  status.className = '';
+  status.dataset.t = 'working';
+  status.textContent = t('working');
+  try {
+    const response = await fetch('/api/flash', { method: 'POST', body: new FormData(form) });
+    const body = await response.text();
+    let message = body;
+    try { message = JSON.parse(body).message; } catch (_) {}
+    status.className = response.ok ? 'ok' : 'error';
+    status.textContent = message || `HTTP ${response.status}`;
+    writing = response.ok;
+  } catch (_) {
+    status.className = 'error';
+    status.textContent = 'Network request failed';
+    writing = false;
+  }
+  delete status.dataset.t;
+  back.disabled = writing;
+  updateButton();
+});
+</script>
+</body>
+</html>
