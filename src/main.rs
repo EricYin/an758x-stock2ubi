@@ -273,7 +273,7 @@ mod linux_app {
         }
         Ok((listen, ignore_kernel_version))
     }
-    
+
     #[allow(dead_code)]
     fn check_kernel_version(ignore_kernel_version: bool) -> Result<(), String> {
         if ignore_kernel_version {
