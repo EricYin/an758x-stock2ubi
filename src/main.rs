@@ -252,7 +252,7 @@ mod linux_app {
 
     fn parse_arguments() -> Result<(String, bool), String> {
         let mut listen = "0.0.0.0:3333".to_string();
-        let mut ignore_kernel_version = false;
+        let mut ignore_kernel_version = true;
         let mut arguments = std::env::args().skip(1);
         while let Some(argument) = arguments.next() {
             match argument.as_str() {
@@ -274,7 +274,6 @@ mod linux_app {
         Ok((listen, ignore_kernel_version))
     }
 
-    #[allow(dead_code)]
     fn check_kernel_version(ignore_kernel_version: bool) -> Result<(), String> {
         if ignore_kernel_version {
             return Ok(());
@@ -292,7 +291,7 @@ mod linux_app {
 
     pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         let (listen, ignore_kernel_version) = parse_arguments()?;
-        //check_kernel_version(ignore_kernel_version)?;
+        check_kernel_version(ignore_kernel_version)?;
         //if unsafe { libc::geteuid() } == 0 {
         //    match unlock::load() {
         //        Ok(()) => println!("MTD write protection cleared"),
