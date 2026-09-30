@@ -3,7 +3,7 @@ mod install;
 #[cfg(target_os = "linux")]
 mod mtd;
 #[cfg(target_os = "linux")]
-mod unlock;
+#mod unlock;
 
 #[cfg(target_os = "linux")]
 mod linux_app {
@@ -24,7 +24,7 @@ mod linux_app {
     use crate::{
         install,
         mtd::{self, Partition},
-        unlock,
+        #unlock,
     };
 
     const INDEX_HTML: &str = include_str!("index.html");
@@ -291,15 +291,15 @@ mod linux_app {
 
     pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         let (listen, ignore_kernel_version) = parse_arguments()?;
-        check_kernel_version(ignore_kernel_version)?;
-        if unsafe { libc::geteuid() } == 0 {
-            match unlock::load() {
-                Ok(()) => println!("MTD write protection cleared"),
-                Err(error) => eprintln!("MTD unlock failed: {error}"),
-            }
-        } else {
-            eprintln!("MTD unlock requires root privileges");
-        }
+        #check_kernel_version(ignore_kernel_version)?;
+        #if unsafe { libc::geteuid() } == 0 {
+        #    match unlock::load() {
+        #        Ok(()) => println!("MTD write protection cleared"),
+        #        Err(error) => eprintln!("MTD unlock failed: {error}"),
+        #    }
+        #} else {
+        #    eprintln!("MTD unlock requires root privileges");
+        #}
         let app = Router::new()
             .route("/", get(index))
             .route("/backup/{index}", get(download_backup))
