@@ -1,4 +1,4 @@
-name: Build AN758x-Stock2UBI - custom
+name: Build AN758x-Stock2UBI - 2
 
 on:
   workflow_dispatch:
