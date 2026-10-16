@@ -7,6 +7,10 @@ reboots into recovery when flashing finishes.
 在原厂系统里刷入 U-Boot 恢复引导，无需拆机。打开网页备份分区并上传引导镜像，
 写入完成后设备会自动重启到恢复页面。
 
+Telnet sessions may time out due to inactivity, causing the program to exit. While using the Web interface, return to the terminal every 20–30 seconds and press a key to keep the Telnet session active until flashing is complete.
+
+Telnet 连接可能因长时间无操作而超时，导致程序退出。使用 Web 页面期间，请每隔 20–30 秒切回终端按一下键盘，保持 Telnet 会话活跃，直到刷写完成。
+
 ## Use / 使用
 
 1. Upload `an758x-stock2ubi` to `/tmp` on the device.<br>
